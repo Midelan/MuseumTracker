@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
+import os
 
 from flask import Flask, request
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://museum_tracker_user:KT2g6hyg3bONXMXx8JpP4LegTf9sGett@dpg-cki3dca12bvs739krt4g-a.oregon-postgres.render.com/museum_tracker'
+
 
 @app.route("/")
 def main():
@@ -27,6 +31,9 @@ def main():
     </form>
     <form action="/authentication" method="POST">
         <input type="submit" value="Login/Register" name="auth_action"/>
+    </form>
+    <form action="/testing" method="POST">
+        <input type="submit" value="Testing" name="test_action"/>
     </form>
      '''
 
@@ -58,3 +65,12 @@ def auth():
     </form>
      '''
 
+@app.route("/testing", methods=["POST"])
+def auth():
+    return '''
+    This page is only for dev testing the cloud platform functionality.
+    Current Test ''' + os.getenv('testEnvVar') + '''
+    <form action="/">
+        <input type="submit" value="Back to Home" name="home_action"/>
+    </form>
+     '''
