@@ -7,10 +7,14 @@ app = Flask(__name__)
 @app.route("/")
 def main():
     return '''
-     <form action="/echo_user_input" method="POST">
-         <input name="user_input">
-         <input type="submit" value="Submit!">
-     </form>
+    <form action="/echo_user_input" method="POST">
+        <input name="user_input">
+        <input type="submit" value="Submit!">
+    </form>
+    <form action="/echo_user_input" method="POST">
+        <input name="user_input">
+        <input type="submit" value="Submit!">
+    </form>
      '''
 
 @app.route("/echo_user_input", methods=["POST"])
