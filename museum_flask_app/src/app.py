@@ -66,7 +66,7 @@ def auth():
      '''
 
 @app.route("/testing", methods=["POST"])
-def auth():
+def testing():
     return '''
     This page is only for dev testing the cloud platform functionality.
     Current Test ''' + os.getenv('testEnvVar') + '''
