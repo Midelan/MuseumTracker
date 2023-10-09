@@ -7,13 +7,12 @@ app = Flask(__name__)
 @app.route("/")
 def main():
     return '''
-    <select name="cars">
-        <option value="Harvard">Harvard Museum of Art</option>
-        <option value="NationalGallery">National Gallery of Art</option>
-        <option value="Smithsonian">Smithsonian</option>
-    </select>
     <form action="/echo_user_input" method="POST">
-        <input name="user_input">
+        <select name="Museum">
+            <option value="Harvard Museum of Art">Harvard Museum of Art</option>
+            <option value="National Gallery of Art">National Gallery of Art</option>
+            <option value="Smithsonian">Smithsonian</option>
+        </select>
         <input type="submit" value="Submit!">
     </form>
     <form action="/authentication" method="POST">
@@ -23,11 +22,11 @@ def main():
 
 @app.route("/echo_user_input", methods=["POST"])
 def echo_input():
-    input_text = request.form.get("user_input", "")
-    return "You entered: " + input_text
+    input_text = request.form.get("Museum", "")
+    return "Sorry, data for the " + input_text + " is not yet available"
 
 @app.route("/authentication", methods=["POST"])
-def echo_input():
+def auth():
     return '''
     Sorry, Authentication is not yet implemented.
     <form action="/" method="POST">
