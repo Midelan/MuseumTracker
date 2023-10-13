@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS artifacts (
+    artifact_id integer PRIMARY KEY,
+    gallery_id integer,
+    title text,
+    image_url text,
+    date_queried date
+);
+
+INSERT INTO migrations
+VALUES ('01_artifact_database_setup')
+ON CONFLICT DO NOTHING;

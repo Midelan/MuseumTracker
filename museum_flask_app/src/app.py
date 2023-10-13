@@ -1,12 +1,35 @@
 #!/usr/bin/env python3
 import os
 
-from flask import Flask, request
+import psycopg2
+from flask import Flask, request, render_template
 from flask_sqlalchemy import SQLAlchemy
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.executors.pool import ProcessPoolExecutor
+
+from .database_setup import migration_manager
+from .musum_apis import api_controller
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://museum_tracker_user:KT2g6hyg3bONXMXx8JpP4LegTf9sGett@dpg-cki3dca12bvs739krt4g-a.oregon-postgres.render.com/museum_tracker'
 
+directory = os.path.dirname(__file__)
+GET_ALL_ARTIFACTS_FILEPATH = os.path.join(directory, '../sql/get_all_artifacts')
+museum_dict = {
+    "Harvard Museum of Art": 1,
+    "National Gallery of Art": 2,
+    "Smithsonian": 3
+}
+
+with app.app_context():
+    migration_manager()
+
+    executors = {
+        'default': {'type': 'threadpool', 'max_workers': 2},
+        'processpool': ProcessPoolExecutor(max_workers=2)
+    }
+    scheduler = BackgroundScheduler(executors=executors)
+    job = scheduler.add_job(api_controller, trigger='cron', hour='7', minute='31')
+    scheduler.start()
 
 @app.route("/")
 def main():
@@ -42,12 +65,18 @@ def echo_input():
     museum_name = request.form.get("Museum", "")
     mode = request.form.get("Mode", "")
     if(mode == "All"):
+        museum_id = museum_dict[museum_name]
+        print(museum_id)
+        file = open(GET_ALL_ARTIFACTS_FILEPATH).read()
+        conn_string = os.getenv('CONNECTION_STRING')
+        conn = psycopg2.connect(conn_string, sslmode='require')
+        cur = conn.cursor()
+        cur.execute(file, (museum_id,))
+        data = cur.fetchall()
         return '''
-        Sorry, full data for the ''' + museum_name + ''' is not yet available
         <form action="/">
             <input type="submit" value="Back to Home" name="home_action"/>
-        </form>
-         '''
+        </form>''' + render_template('table.html', data=data)
     else:
         return '''
         Sorry, new data for the ''' + museum_name + ''' is not yet available
@@ -67,6 +96,7 @@ def auth():
 
 @app.route("/testing", methods=["POST"])
 def testing():
+    api_controller()
     return '''
     This page is only for dev testing the cloud platform functionality.
     Current Test ''' + os.getenv('testEnvVar') + '''
