@@ -1,11 +1,11 @@
-CREATE TABLE IF NOT EXISTS artifacts (
-    artifact_id integer PRIMARY KEY,
-    gallery_id integer,
-    title text,
-    image_url text,
-    date_queried date
+CREATE TABLE IF NOT EXISTS museums (
+    museum_id integer PRIMARY KEY,
+    museum_name text
 );
 
+INSERT INTO museums
+VALUES (1,'Harvard Museum of Art');
+
 INSERT INTO migrations
-VALUES ('01_artifact_database_setup')
+VALUES ('02_museum_database_setup')
 ON CONFLICT DO NOTHING;

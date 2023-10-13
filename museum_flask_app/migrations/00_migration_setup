@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS migrations (
+    migration_name varchar(40) PRIMARY KEY
+);
+
+INSERT INTO migrations
+VALUES ('00_migration_setup')
+ON CONFLICT DO NOTHING;

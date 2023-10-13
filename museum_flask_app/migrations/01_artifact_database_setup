@@ -1,9 +1,13 @@
 CREATE TABLE IF NOT EXISTS artifacts (
-    artifact_id integer PRIMARY KEY,
-    gallery_id integer,
+    artifact_id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    museum_artifact_id integer NOT NULL,
+    museum_id integer NOT NULL,
+    gallery_id text,
     title text,
     image_url text,
-    date_queried date
+    date_queried timestamp,
+    date_added timestamp,
+    UNIQUE(museum_id, museum_artifact_id)
 );
 
 INSERT INTO migrations
