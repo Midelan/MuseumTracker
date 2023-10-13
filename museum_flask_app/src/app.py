@@ -28,7 +28,9 @@ with app.app_context():
         'processpool': ProcessPoolExecutor(max_workers=2)
     }
     scheduler = BackgroundScheduler(executors=executors)
-    job = scheduler.add_job(api_controller, trigger='cron', hour='8', minute='40')
+    print(scheduler.get_jobs())
+    job = scheduler.add_job(api_controller, trigger='cron', hour='7', minute='31', misfire_grace_time=60*60)
+    scheduler.print_jobs()
     scheduler.start()
 
 @app.route("/")
