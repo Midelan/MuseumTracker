@@ -29,7 +29,7 @@ with app.app_context():
     }
     scheduler = BackgroundScheduler(executors=executors)
     print(scheduler.get_jobs())
-    job = scheduler.add_job(api_controller, trigger='cron', hour='7', minute='31', misfire_grace_time=60*60)
+    job = scheduler.add_job(api_controller, trigger='cron', hour='9', minute='12', misfire_grace_time=60*60)
     scheduler.print_jobs()
     scheduler.start()
 
