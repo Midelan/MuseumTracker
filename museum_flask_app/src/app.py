@@ -8,8 +8,8 @@ from flask_sqlalchemy import SQLAlchemy
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.executors.pool import ProcessPoolExecutor
 
-from .database_setup import migration_manager
-from .musum_apis import api_controller
+from .database_setup import MigrationManager
+from .musum_apis import APIController
 
 app = Flask(__name__)
 
@@ -22,7 +22,8 @@ museum_dict = {
 }
 
 with app.app_context():
-    migration_manager()
+    migrator = MigrationManager()
+    migrator.migration_manager()
 
     executors = {
         'default': {'type': 'threadpool', 'max_workers': 2},
@@ -31,9 +32,11 @@ with app.app_context():
     scheduler = BackgroundScheduler(executors=executors)
     print(scheduler.get_jobs())
     print(datetime.now())
-    job = scheduler.add_job(api_controller, trigger='cron', hour='13', minute='20', misfire_grace_time=60*60)
+    api_controller = APIController()
+    job = scheduler.add_job(api_controller.start, trigger='cron', hour='13', minute='20', misfire_grace_time=60*60)
     scheduler.print_jobs()
     scheduler.start()
+
 
 @app.route("/")
 def main():
@@ -64,6 +67,7 @@ def main():
     </form>
      '''
 
+
 @app.route("/echo_user_input", methods=["POST"])
 def echo_input():
     museum_name = request.form.get("Museum", "")
@@ -89,6 +93,7 @@ def echo_input():
         </form>
          '''
 
+
 @app.route("/authentication", methods=["POST"])
 def auth():
     return '''
@@ -98,9 +103,9 @@ def auth():
     </form>
      '''
 
+
 @app.route("/testing", methods=["POST"])
 def testing():
-    api_controller()
     return '''
     This page is only for dev testing the cloud platform functionality.
     Current Test ''' + os.getenv('testEnvVar') + '''
