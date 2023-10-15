@@ -14,7 +14,7 @@ from prometheus_flask_exporter import PrometheusMetrics
 
 from .new_artifact_check import NewArtifactChecker
 from .database_setup import MigrationManager
-from .musum_apis import APIController
+from .museum_apis import APIController
 
 app = Flask(__name__)
 metrics = PrometheusMetrics(app)
