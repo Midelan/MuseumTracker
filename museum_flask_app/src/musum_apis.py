@@ -43,7 +43,7 @@ class APIController:
             query_run_time = datetime.now()
         else:
             query_run_time = datetime_input
-        pika_conn = pika.BlockingConnection(pika.ConnectionParameters("localhost"))
+        pika_conn = pika.BlockingConnection(pika.ConnectionParameters(os.getenv('PIKA_HOST')))
         self.channel = pika_conn.channel()
         self.channel.queue_declare(queue='artifacts')
         self.harvard_api_controller(query_run_time)
