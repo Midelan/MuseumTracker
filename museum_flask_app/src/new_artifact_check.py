@@ -36,7 +36,7 @@ class NewArtifactChecker:
         self.pool.putconn(conn)
 
     def start_listener(self):
-        pika_conn = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+        pika_conn = pika.BlockingConnection(pika.ConnectionParameters(host=os.getenv('PIKA_HOST')))
         self.channel = pika_conn.channel()
         self.channel.queue_declare(queue='artifacts')
         self.channel.basic_consume(queue='artifacts', on_message_callback=self.callback, auto_ack=True)
