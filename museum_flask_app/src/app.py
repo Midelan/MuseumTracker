@@ -253,5 +253,11 @@ def logout():
     </form>
     '''
 
+
+@app.route("/health")
+def health():
+    return 200
+
+
 class User(flask_login.UserMixin):
     pass
