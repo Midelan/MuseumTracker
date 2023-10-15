@@ -11,9 +11,9 @@ import testing.postgresql
 from sqlalchemy import create_engine
 from unittest import mock
 
-from museum_flask_app.src.museum_apis import APIController
-from museum_flask_app.src.database_setup import MigrationManager
-from museum_flask_app.src.new_artifact_check import NewArtifactChecker
+from src.museum_apis import APIController
+from src.database_setup import MigrationManager
+from src.new_artifact_check import NewArtifactChecker
 
 artifacts_added = []
 
@@ -95,12 +95,13 @@ class TestIntegation:
         connection = TestIntegation.db
         return connection
 
-    @mock.patch('museum_flask_app.src.database_setup.psycopg2.connect', side_effect=mock_connection)
-    @mock.patch('museum_flask_app.src.musum_apis.psycopg2.pool.SimpleConnectionPool', side_effect=mock_pool)
-    @mock.patch('museum_flask_app.src.musum_apis.requests.get', side_effect=mock_requests)
+    @mock.patch('src.database_setup.psycopg2.connect', side_effect=mock_connection)
+    @mock.patch('src.museum_apis.psycopg2.pool.SimpleConnectionPool', side_effect=mock_pool)
+    @mock.patch('src.museum_apis.requests.get', side_effect=mock_requests)
     def test_integration(self, requests_mocker, pool_mocker, connection_mocker):
         test_run_time = datetime.now()
         os.environ["HARVARD_API_KEY"] = 'fake_api_key'
+        os.environ["PIKA_HOST"] = 'localhost'
         migrator = MigrationManager()
         migrator.migration_manager()
         validation_cursor = TestIntegation.db.cursor()
