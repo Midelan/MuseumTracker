@@ -5,7 +5,7 @@ from datetime import datetime
 
 import pytest
 
-from museum_flask_app.src.musum_apis import APIController
+from museum_flask_app.src.museum_apis import APIController
 
 
 class TestMuseumAPIs:

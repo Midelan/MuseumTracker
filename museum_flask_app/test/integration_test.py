@@ -11,7 +11,7 @@ import testing.postgresql
 from sqlalchemy import create_engine
 from unittest import mock
 
-from museum_flask_app.src.musum_apis import APIController
+from museum_flask_app.src.museum_apis import APIController
 from museum_flask_app.src.database_setup import MigrationManager
 from museum_flask_app.src.new_artifact_check import NewArtifactChecker
 
