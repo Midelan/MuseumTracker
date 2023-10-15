@@ -64,28 +64,85 @@ class TestMuseumAPIs:
         return MockResponse()
 
     def mock_pool(minconn, maxconn, user, password, host, port, database):
+        class MockCursor:
+            def __init__(self):
+                pass
+
+            def execute(self, file, params):
+                pass
+
+            def close(self):
+                pass
+
+        class MockConnection:
+            def __init__(self):
+                pass
+
+            def cursor(self):
+                return MockCursor()
+
+            def commit(self):
+                return
+
         class MockPool:
 
             def __init__(self):
                 pass
 
             def getconn(self):
-                pass
+                return MockConnection()
 
             def putconn(self, connection):
                 pass
 
         return MockPool()
 
+    def mock_channel(self):
+        class MockChannel:
+
+            def __init__(self):
+                pass
+
+            def queue_declare(self, queue):
+                pass
+
+        class MockConnection:
+
+            def __init__(self):
+                pass
+
+            def channel(self):
+                return MockChannel()
+
+        return MockConnection()
+
+
     def mock_harvard_objects(run_time, gallery, url):
+        return
+
+    def mock_publish_to_queue(museum_artifact_id, museum_id, query_run_time):
         return
 
     @mock.patch('museum_flask_app.src.musum_apis.requests.get', side_effect=mock_requests)
     @mock.patch('museum_flask_app.src.musum_apis.APIController.get_harvard_objects', side_effect=mock_harvard_objects)
     @mock.patch('museum_flask_app.src.musum_apis.psycopg2.pool.SimpleConnectionPool', side_effect=mock_pool)
-    def test_single_page_gallery(self, mock_connection_pool, mock_harvard_objects, mock_requests):
+    @mock.patch('museum_flask_app.src.musum_apis.pika.BlockingConnection', side_effect=mock_channel)
+    def test_gallery(self, mock_channel, mock_connection_pool, mock_harvard_objects, mock_requests):
         os.environ["HARVARD_API_KEY"] = 'fake_api_key'
+        os.environ["PIKA_HOST"] = 'fake_host'
         api_controller = APIController()
         api_controller.start()
         assert(mock_harvard_objects.call_count == 3)
+        assert(mock_requests.call_count == 2)
+
+    @mock.patch('museum_flask_app.src.musum_apis.APIController.publish_to_queue', side_effect=mock_publish_to_queue)
+    @mock.patch('museum_flask_app.src.musum_apis.requests.get', side_effect=mock_requests)
+    @mock.patch('museum_flask_app.src.musum_apis.psycopg2.pool.SimpleConnectionPool', side_effect=mock_pool)
+    @mock.patch('museum_flask_app.src.musum_apis.pika.BlockingConnection', side_effect=mock_channel)
+    def test_objects(self, mock_channel, mock_connection_pool, mock_requests, mock_publish):
+        os.environ["HARVARD_API_KEY"] = 'fake_api_key'
+        os.environ["PIKA_HOST"] = 'fake_host'
+        time = datetime(2014, 5, 12, 23, 30, 12, 134)
+        api_controller = APIController()
+        api_controller.get_harvard_objects(time, 1, '1000')
         assert(mock_requests.call_count == 2)
