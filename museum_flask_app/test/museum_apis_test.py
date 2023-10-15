@@ -5,8 +5,7 @@ from datetime import datetime
 
 import pytest
 
-from museum_flask_app.src.museum_apis import APIController
-
+from src.museum_apis import APIController
 
 class TestMuseumAPIs:
 
@@ -123,10 +122,10 @@ class TestMuseumAPIs:
     def mock_publish_to_queue(museum_artifact_id, museum_id, query_run_time):
         return
 
-    @mock.patch('museum_flask_app.src.musum_apis.requests.get', side_effect=mock_requests)
-    @mock.patch('museum_flask_app.src.musum_apis.APIController.get_harvard_objects', side_effect=mock_harvard_objects)
-    @mock.patch('museum_flask_app.src.musum_apis.psycopg2.pool.SimpleConnectionPool', side_effect=mock_pool)
-    @mock.patch('museum_flask_app.src.musum_apis.pika.BlockingConnection', side_effect=mock_channel)
+    @mock.patch('src.museum_apis.requests.get', side_effect=mock_requests)
+    @mock.patch('src.museum_apis.APIController.get_harvard_objects', side_effect=mock_harvard_objects)
+    @mock.patch('src.museum_apis.psycopg2.pool.SimpleConnectionPool', side_effect=mock_pool)
+    @mock.patch('src.museum_apis.pika.BlockingConnection', side_effect=mock_channel)
     def test_gallery(self, mock_channel, mock_connection_pool, mock_harvard_objects, mock_requests):
         os.environ["HARVARD_API_KEY"] = 'fake_api_key'
         os.environ["PIKA_HOST"] = 'fake_host'
@@ -135,10 +134,10 @@ class TestMuseumAPIs:
         assert(mock_harvard_objects.call_count == 3)
         assert(mock_requests.call_count == 2)
 
-    @mock.patch('museum_flask_app.src.musum_apis.APIController.publish_to_queue', side_effect=mock_publish_to_queue)
-    @mock.patch('museum_flask_app.src.musum_apis.requests.get', side_effect=mock_requests)
-    @mock.patch('museum_flask_app.src.musum_apis.psycopg2.pool.SimpleConnectionPool', side_effect=mock_pool)
-    @mock.patch('museum_flask_app.src.musum_apis.pika.BlockingConnection', side_effect=mock_channel)
+    @mock.patch('src.museum_apis.APIController.publish_to_queue', side_effect=mock_publish_to_queue)
+    @mock.patch('src.museum_apis.requests.get', side_effect=mock_requests)
+    @mock.patch('src.museum_apis.psycopg2.pool.SimpleConnectionPool', side_effect=mock_pool)
+    @mock.patch('src.museum_apis.pika.BlockingConnection', side_effect=mock_channel)
     def test_objects(self, mock_channel, mock_connection_pool, mock_requests, mock_publish):
         os.environ["HARVARD_API_KEY"] = 'fake_api_key'
         os.environ["PIKA_HOST"] = 'fake_host'
