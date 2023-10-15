@@ -5,6 +5,7 @@ import os
 import psycopg2
 import psycopg2.pool
 import requests
+import pika
 
 from datetime import datetime
 
@@ -24,9 +25,11 @@ class APIController:
     conn_port = None
     conn_db = None
     harvard_api_key = None
+    channel = None
     def __init__(self):
         pass
-    def start(self):
+
+    def start(self, datetime_input = None):
         self.conn_user = os.getenv('CONNECTION_USER')
         self.conn_pass = os.getenv('CONNECTION_PASS')
         self.conn_host = os.getenv('CONNECTION_HOST')
@@ -36,8 +39,21 @@ class APIController:
         self.pool = psycopg2.pool.SimpleConnectionPool(
             1, 2, user=self.conn_user, password=self.conn_pass,
             host=self.conn_host, port=self.conn_port, database=self.conn_db)
-        query_run_time = datetime.now()
+        if(datetime_input == None):
+            query_run_time = datetime.now()
+        else:
+            query_run_time = datetime_input
+        pika_conn = pika.BlockingConnection(pika.ConnectionParameters("localhost"))
+        self.channel = pika_conn.channel()
+        self.channel.queue_declare(queue='artifacts')
         self.harvard_api_controller(query_run_time)
+        conn = self.pool.getconn()
+        cur = conn.cursor()
+        cur.execute('DELETE FROM artifacts WHERE date_queried != %s', (query_run_time,))
+        conn.commit()
+        cur.close()
+        self.pool.putconn(conn)
+
 
 
     def harvard_api_controller(self, query_run_time, url = None):
@@ -62,7 +78,6 @@ class APIController:
 
     def get_harvard_objects(self, query_run_time, gallery_id, objects_url):
         file = open(ADD_TO_ARTIFACTS_FILEPATH).read()
-
         try:
             objects_response = requests.get(objects_url).json()
         except:
@@ -78,7 +93,7 @@ class APIController:
             try:
                 conn = self.pool.getconn()
                 cur = conn.cursor()
-                cur.execute(file, (gallery_id, title, image_url, 1, museum_artifact_id))
+                cur.execute(file, (gallery_id, title, image_url, 1, museum_artifact_id, query_run_time))
                 new_artifact_id = cur.fetchone()[0]
                 conn.commit()
                 cur.close()
@@ -89,6 +104,16 @@ class APIController:
                     cur.close()
                 except:
                     pass
+            self.publish_to_queue(museum_artifact_id, 1, query_run_time)
             print('Added artifact ID ' + str(new_artifact_id))
         if('next' in objects_response['info']):
             self.get_harvard_objects(query_run_time, gallery_id, objects_response['info']['next'])
+
+    def publish_to_queue(self, museum_artifact_id, museum_id, query_run_time):
+        timestamp = query_run_time.strftime("%Y-%m-%d %H:%M:%S")
+        self.channel.basic_publish(exchange='', routing_key='artifacts',
+           body=json.dumps({
+               "museum_artifact_id": museum_artifact_id,
+               "museum_id": museum_id,
+               "query_run_time": timestamp
+           }))

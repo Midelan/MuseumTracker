@@ -1,0 +1,4 @@
+INSERT INTO new_artifacts (user_id, museum_id, museum_artifact_id, already_seen)
+SELECT user_id, %s, %s, %s
+FROM users
+ON CONFLICT(user_id, museum_id, museum_artifact_id) DO NOTHING
