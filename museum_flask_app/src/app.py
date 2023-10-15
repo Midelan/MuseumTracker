@@ -256,7 +256,7 @@ def logout():
 
 @app.route("/health")
 def health():
-    return 200
+    return {'message': 'Healthy'}
 
 
 class User(flask_login.UserMixin):
