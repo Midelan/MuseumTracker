@@ -1,0 +1,8 @@
+SELECT gallery_id, title, image_url
+FROM artifacts
+INNER JOIN new_artifacts
+ON new_artifacts.museum_artifact_id = artifacts.museum_artifact_id
+AND new_artifacts.museum_id = artifacts.museum_id
+WHERE artifacts.museum_id = %s
+AND new_artifacts.user_id = %s
+AND new_artifacts.already_seen = False;

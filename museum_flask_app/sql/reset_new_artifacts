@@ -1,0 +1,4 @@
+UPDATE new_artifacts
+SET already_seen = True
+WHERE new_artifacts.museum_id = %s
+AND new_artifacts.user_id = %s;

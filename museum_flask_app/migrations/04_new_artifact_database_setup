@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS new_artifacts (
+    user_id text,
+    museum_id integer,
+    museum_artifact_id integer,
+    already_seen boolean,
+    UNIQUE(user_id, museum_id, museum_artifact_id)
+);
+
+INSERT INTO migrations
+VALUES ('04_new_artifact_database_setup')
+ON CONFLICT DO NOTHING;

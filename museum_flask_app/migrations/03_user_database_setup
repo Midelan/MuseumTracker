@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS users (
+    user_id text PRIMARY KEY,
+    password text,
+    last_visit timestamp
+);
+
+INSERT INTO migrations
+VALUES ('03_user_database_setup')
+ON CONFLICT DO NOTHING;
