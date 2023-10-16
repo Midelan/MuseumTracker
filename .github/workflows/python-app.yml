@@ -31,4 +31,5 @@ jobs:
         pip install psycopg2-binary
     - name: Test with pytest
       run: |
+        pwd
         pytest ./MuseumTracker/museum_flask_app/test/museum_apis_test.py
