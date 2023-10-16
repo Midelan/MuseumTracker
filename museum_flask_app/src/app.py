@@ -45,7 +45,7 @@ with app.app_context():
     print(scheduler.get_jobs())
     print(datetime.now())
     api_controller = APIController()
-    job = scheduler.add_job(api_controller.start, trigger='cron', hour='17', minute='45', misfire_grace_time=60*60)
+    job = scheduler.add_job(api_controller.start, trigger='cron', hour='01', minute='05', misfire_grace_time=60*60)
     scheduler.print_jobs()
     scheduler.start()
 
